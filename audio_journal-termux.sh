@@ -24,7 +24,15 @@ record_entry() {
 
     mkdir -p "$entry_dir"
     echo "$title" > "$entry_dir/$timestamp.txt"
-    arecord -d 600 -f cd -r 11025 "$entry_file"
+    termux-microphone-record -f "$entry_file" -l 600 -b 192
+    whiptail --title "Recording" --msgbox "Enter to stop recording" 10 30
+    termux-microphone-record -q
+
+    # amplify before converting
+    ffmpeg -i "$entry_file" -filter:a "volume=4.0"  temp_amp.wav
+    mv temp_amp.wav "$entry_file"
+
+    #arecord -d 600 -f cd -r 11025 "$entry_file"
     ffmpeg -i "$entry_file" "${entry_file%.wav}.mp3"
     rm "$entry_file"
     echo "Entry recorded as ${entry_file%.wav}.mp3 with title: $title"
@@ -67,7 +75,7 @@ select_entry() {
     return 6
   fi
 
-  selected=$(whiptail --title "Audio Journal" --menu "Select an entry" 20 80 10 $entries 3>&1 1>&2 2>&3)
+  selected=$(whiptail --title "Audio Journal" --menu "Select an entry" 20 50 10 $entries 3>&1 1>&2 2>&3)
   if [ $? != 0 ]; then
     return 1
   fi
@@ -88,7 +96,9 @@ play_entry() {
   if [ $select_entry_status = 0 ]; then
     title=$(cat "${selected_file%.mp3}.txt")
     echo "Playing entry: $title"
-    ffplay -nodisp -autoexit "$selected_file"
+
+    termux-media-player play "$selected_file"
+    #ffplay -nodisp -autoexit "$selected_file"
   fi
 }
 
