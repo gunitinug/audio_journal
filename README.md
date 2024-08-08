@@ -14,4 +14,6 @@ Then run termux and
 
 `pkg install termux-api whiptail ffmpeg`
 
+And run audio_journal-termux_1.sh.
+
 Enjoy!
