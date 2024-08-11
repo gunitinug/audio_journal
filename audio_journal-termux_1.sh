@@ -105,6 +105,7 @@ play_entry() {
     duration=$(ffprobe -v error -show_entries format=duration -of default=nk=1:nw=1 "$selected_file")
     rounded=$(printf "%.0f" "$duration")
     sleep $((rounded+1))
+    clear
   fi
 }
 
